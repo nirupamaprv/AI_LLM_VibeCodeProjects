@@ -1,0 +1,581 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2639
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 AppleColorEmoji;\f2\fnil\fcharset0 LucidaGrande;
+}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 <!DOCTYPE html>\
+<html lang="en">\
+<head>\
+<meta charset="UTF-8">\
+<meta name="viewport" content="width=device-width, initial-scale=1.0">\
+<title>Medium Earnings Analyzer</title>\
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>\
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">\
+<style>\
+  :root \{\
+    --ink: #1a1917;\
+    --ink2: #4a4845;\
+    --ink3: #8a8784;\
+    --paper: #faf9f6;\
+    --paper2: #f2f0eb;\
+    --paper3: #e8e5de;\
+    --accent: #c4622d;\
+    --accent2: #2d7c5f;\
+    --accent3: #5b4fa8;\
+    --accent4: #b8952a;\
+    --border: #dedad2;\
+    --radius: 10px;\
+  \}\
+  * \{ box-sizing: border-box; margin: 0; padding: 0; \}\
+  body \{ font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; \}\
+\
+  /* Upload state */\
+  #upload-view \{ display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; \}\
+  .upload-heading \{ font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 5vw, 3.5rem); color: var(--ink); text-align: center; line-height: 1.15; margin-bottom: .5rem; \}\
+  .upload-sub \{ font-size: 1rem; color: var(--ink3); text-align: center; margin-bottom: 2.5rem; font-weight: 300; \}\
+  .drop-zone \{\
+    width: min(520px, 100%);\
+    border: 2px dashed var(--border);\
+    border-radius: 16px;\
+    padding: 3rem 2rem;\
+    text-align: center;\
+    cursor: pointer;\
+    transition: border-color .2s, background .2s;\
+    background: var(--paper2);\
+  \}\
+  .drop-zone:hover, .drop-zone.drag-over \{ border-color: var(--accent); background: #fdf5f0; \}\
+  .drop-icon \{ font-size: 2.5rem; margin-bottom: 1rem; \}\
+  .drop-label \{ font-size: .95rem; color: var(--ink2); margin-bottom: .5rem; \}\
+  .drop-hint \{ font-size: .8rem; color: var(--ink3); \}\
+  .drop-zone input \{ display: none; \}\
+  .file-pills \{ display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 1.25rem; \}\
+  .file-pill \{ background: var(--paper3); border-radius: 20px; padding: 4px 12px; font-size: .78rem; color: var(--ink2); \}\
+  .analyze-btn \{\
+    margin-top: 1.75rem;\
+    background: var(--accent);\
+    color: white;\
+    border: none;\
+    border-radius: 8px;\
+    padding: .75rem 2.5rem;\
+    font-family: 'DM Sans', sans-serif;\
+    font-size: 1rem;\
+    font-weight: 500;\
+    cursor: pointer;\
+    transition: opacity .2s, transform .1s;\
+    display: none;\
+  \}\
+  .analyze-btn:hover \{ opacity: .88; \}\
+  .analyze-btn:active \{ transform: scale(.98); \}\
+\
+  /* Results state */\
+  #results-view \{ display: none; padding: 2rem max(1rem, calc(50vw - 560px)); \}\
+  .results-header \{ display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border); \}\
+  .results-title \{ font-family: 'DM Serif Display', serif; font-size: 1.9rem; color: var(--ink); \}\
+  .reset-btn \{ font-size: .8rem; color: var(--ink3); background: none; border: 1px solid var(--border); border-radius: 6px; padding: 4px 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; \}\
+  .reset-btn:hover \{ border-color: var(--ink3); color: var(--ink2); \}\
+\
+  /* KPI row */\
+  .kpi-row \{ display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 2rem; \}\
+  .kpi \{ background: var(--paper2); border-radius: var(--radius); padding: 14px 16px; border: 1px solid var(--border); \}\
+  .kpi-label \{ font-size: .72rem; font-weight: 500; text-transform: uppercase; letter-spacing: .07em; color: var(--ink3); margin-bottom: 5px; \}\
+  .kpi-val \{ font-size: 1.7rem; font-weight: 600; color: var(--ink); line-height: 1; \}\
+  .kpi-sub \{ font-size: .75rem; color: var(--ink3); margin-top: 4px; \}\
+\
+  /* Section */\
+  .section \{ margin-bottom: 2.5rem; \}\
+  .section-title \{ font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--ink); margin-bottom: 1rem; \}\
+  .section-title span \{ font-family: 'DM Sans', sans-serif; font-size: .75rem; font-weight: 400; color: var(--ink3); margin-left: 8px; \}\
+\
+  /* Charts */\
+  .charts-row \{ display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 2rem; \}\
+  @media (max-width: 640px) \{ .charts-row \{ grid-template-columns: 1fr; \} \}\
+  .chart-card \{ background: var(--paper2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; \}\
+  .chart-card-label \{ font-size: .75rem; font-weight: 500; text-transform: uppercase; letter-spacing: .07em; color: var(--ink3); margin-bottom: 12px; \}\
+\
+  /* Top earners table */\
+  .earners-table \{ width: 100%; border-collapse: collapse; font-size: .88rem; \}\
+  .earners-table th \{ text-align: left; font-size: .72rem; font-weight: 500; text-transform: uppercase; letter-spacing: .07em; color: var(--ink3); padding: 0 12px 8px 0; border-bottom: 1px solid var(--border); \}\
+  .earners-table td \{ padding: 9px 12px 9px 0; border-bottom: 1px solid var(--border); color: var(--ink2); vertical-align: top; \}\
+  .earners-table tr:last-child td \{ border-bottom: none; \}\
+  .earners-table td:last-child \{ color: var(--ink); font-weight: 600; white-space: nowrap; \}\
+  .cat-badge \{ display: inline-block; font-size: .7rem; font-weight: 500; border-radius: 4px; padding: 2px 7px; white-space: nowrap; \}\
+\
+  /* Dead series */\
+  .dead-grid \{ display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; \}\
+  .dead-card \{ background: var(--paper2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; \}\
+  .dead-name \{ font-size: .85rem; font-weight: 500; color: var(--ink2); margin-bottom: 3px; \}\
+  .dead-stat \{ font-size: .75rem; color: var(--ink3); \}\
+\
+  /* Recommendations */\
+  .rec \{ border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; margin-bottom: 12px; display: grid; grid-template-columns: 42px 1fr; gap: 14px; \}\
+  .rec-num \{ font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: var(--paper3); line-height: 1; padding-top: 2px; \}\
+  .rec-title \{ font-size: .95rem; font-weight: 600; color: var(--ink); margin-bottom: 6px; \}\
+  .rec-body \{ font-size: .85rem; color: var(--ink2); line-height: 1.65; margin-bottom: 10px; \}\
+  .rec-examples \{ display: flex; flex-wrap: wrap; gap: 5px; \}\
+  .rec-ex \{ font-size: .75rem; font-family: 'DM Serif Display', serif; font-style: italic; color: var(--ink2); background: var(--paper3); border-radius: 20px; padding: 3px 10px; \}\
+  .priority-tag \{ display: inline-block; font-size: .7rem; font-weight: 600; border-radius: 4px; padding: 2px 8px; margin-right: 6px; text-transform: uppercase; letter-spacing: .04em; \}\
+  .pt-high \{ background: #fde8dc; color: #8b3515; \}\
+  .pt-med  \{ background: #d6f0e6; color: #185c3e; \}\
+  .pt-opp  \{ background: #ece9fb; color: #3d3482; \}\
+\
+  /* Bar chart */\
+  .bar-row \{ display: flex; align-items: center; gap: 10px; margin-bottom: 8px; \}\
+  .bar-label \{ font-size: .8rem; color: var(--ink2); min-width: 170px; max-width: 170px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; \}\
+  .bar-track \{ flex: 1; height: 9px; background: var(--paper3); border-radius: 5px; overflow: hidden; \}\
+  .bar-fill \{ height: 100%; border-radius: 5px; transition: width .6s ease; \}\
+  .bar-val \{ font-size: .75rem; color: var(--ink3); min-width: 52px; text-align: right; \}\
+\
+  .note \{ font-size: .78rem; color: var(--ink3); font-style: italic; margin-top: .5rem; \}\
+  .divider \{ border: none; border-top: 1px solid var(--border); margin: 2rem 0; \}\
+\
+  /* Loading */\
+  #loading \{ display: none; position: fixed; inset: 0; background: var(--paper); z-index: 99; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; \}\
+  .spinner \{ width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; \}\
+  @keyframes spin \{ to \{ transform: rotate(360deg); \} \}\
+  .loading-text \{ font-size: .9rem; color: var(--ink3); \}\
+</style>\
+</head>\
+<body>\
+\
+<div id="loading">\
+  <div class="spinner"></div>\
+  <div class="loading-text">Analyzing your posts\'85</div>\
+</div>\
+\
+<!-- UPLOAD VIEW -->\
+<div id="upload-view">\
+  <div class="upload-heading">Medium Earnings<br><em>Analyzer</em></div>\
+  <div class="upload-sub">Drop your Partner Program HTML export files to see what's actually making you money</div>\
+\
+  <div class="drop-zone" id="dropZone">\
+    <div class="drop-icon">
+\f1 \uc0\u55357 \u56514 
+\f0 </div>\
+    <div class="drop-label">Drop your <strong>posts-00XX.html</strong> files here</div>\
+    <div class="drop-hint">or click to browse \'97 multiple files supported</div>\
+    <input type="file" id="fileInput" multiple accept=".html">\
+  </div>\
+  <div class="file-pills" id="filePills"></div>\
+  <button class="analyze-btn" id="analyzeBtn" onclick="runAnalysis()">Analyze 
+\f2 \uc0\u8594 
+\f0 </button>\
+</div>\
+\
+<!-- RESULTS VIEW -->\
+<div id="results-view">\
+  <div class="results-header">\
+    <div class="results-title">Your Earnings Report</div>\
+    <button class="reset-btn" onclick="resetTool()">
+\f2 \uc0\u8592 
+\f0  Upload new files</button>\
+  </div>\
+\
+  <div class="kpi-row" id="kpiRow"></div>\
+\
+  <div class="charts-row">\
+    <div class="chart-card">\
+      <div class="chart-card-label">Earnings by category \'97 total $</div>\
+      <div style="position:relative;height:220px"><canvas id="catChart"></canvas></div>\
+    </div>\
+    <div class="chart-card">\
+      <div class="chart-card-label">Title structure \'97 what format earns</div>\
+      <div style="position:relative;height:220px"><canvas id="structChart"></canvas></div>\
+    </div>\
+  </div>\
+\
+  <div class="section">\
+    <div class="section-title">Average earnings per post <span>which categories pay per post</span></div>\
+    <div id="avgBars"></div>\
+  </div>\
+\
+  <div class="section">\
+    <div class="section-title">Top earning posts <span>non-Medium, sorted by $</span></div>\
+    <div style="overflow-x:auto"><table class="earners-table"><thead><tr><th>Title</th><th>Category</th><th>Earned</th></tr></thead><tbody id="earnerRows"></tbody></table></div>\
+  </div>\
+\
+  <hr class="divider">\
+\
+  <div class="section">\
+    <div class="section-title">What's not working <span>high volume, near-zero earnings</span></div>\
+    <div class="dead-grid" id="deadGrid"></div>\
+    <div class="note" id="deadNote"></div>\
+  </div>\
+\
+  <hr class="divider">\
+\
+  <div class="section">\
+    <div class="section-title">5 Recommendations to Replicate Success</div>\
+    <div id="recsContainer"></div>\
+  </div>\
+</div>\
+\
+<script>\
+// \uc0\u9472 \u9472 \u9472  FILE HANDLING \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \
+let loadedFiles = [];\
+\
+const dropZone = document.getElementById('dropZone');\
+const fileInput = document.getElementById('fileInput');\
+const filePills = document.getElementById('filePills');\
+const analyzeBtn = document.getElementById('analyzeBtn');\
+\
+dropZone.addEventListener('click', () => fileInput.click());\
+fileInput.addEventListener('change', e => handleFiles([...e.target.files]));\
+dropZone.addEventListener('dragover', e => \{ e.preventDefault(); dropZone.classList.add('drag-over'); \});\
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));\
+dropZone.addEventListener('drop', e => \{ e.preventDefault(); dropZone.classList.remove('drag-over'); handleFiles([...e.dataTransfer.files]); \});\
+\
+function handleFiles(files) \{\
+  const htmlFiles = files.filter(f => f.name.endsWith('.html'));\
+  htmlFiles.forEach(f => \{ if (!loadedFiles.find(x => x.name === f.name)) loadedFiles.push(f); \});\
+  renderPills();\
+\}\
+function renderPills() \{\
+  filePills.innerHTML = loadedFiles.map(f => `<span class="file-pill">
+\f1 \uc0\u55357 \u56516 
+\f0  $\{f.name\}</span>`).join('');\
+  analyzeBtn.style.display = loadedFiles.length ? 'inline-block' : 'none';\
+\}\
+\
+// \uc0\u9472 \u9472 \u9472  CATEGORIZATION \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \
+const CAT_COLORS = \{\
+  'Books & reading':       \{ bar: '#9FE1CB', badge: 'background:#d6f0e6;color:#185c3e' \},\
+  'Writing craft':         \{ bar: '#FAC775', badge: 'background:#fef3dc;color:#7a5010' \},\
+  'Career & leadership':   \{ bar: '#CECBF6', badge: 'background:#ece9fb;color:#3d3482' \},\
+  'Reading productivity':  \{ bar: '#85B7EB', badge: 'background:#deedf9;color:#144e82' \},\
+  'How-to & listicles':    \{ bar: '#F0997B', badge: 'background:#fde8dc;color:#8b3515' \},\
+  'Finance & money':       \{ bar: '#97C459', badge: 'background:#e5f2d0;color:#2e5409' \},\
+  'Parenting & family':    \{ bar: '#F4C0D1', badge: 'background:#fbe8ef;color:#7a2040' \},\
+  'Gratitude & mindset':   \{ bar: '#EF9F27', badge: 'background:#fef0d5;color:#7a4c00' \},\
+  'Tech & AI':             \{ bar: '#B5D4F4', badge: 'background:#deedf9;color:#144e82' \},\
+  'Personal milestones':   \{ bar: '#C0DD97', badge: 'background:#e5f2d0;color:#2e5409' \},\
+  'Snapshots & updates':   \{ bar: '#D3D1C7', badge: 'background:#edece6;color:#4a4845' \},\
+  'Other':                 \{ bar: '#B4B2A9', badge: 'background:#edece6;color:#4a4845' \},\
+\};\
+\
+function categorize(title) \{\
+  const t = title.toLowerCase();\
+  if (/\\bmedium\\b/.test(t)) return '__MEDIUM__';\
+  if (/\\b(kindle|goodread|bookstagram|book club|reading retention|read faster|how to read|reading habit|reading ruler|reading challenge|reading roundup|summary magic|reading goal|read.*book|book.*read|library|books? to|reasons? to read)\\b/.test(t)) return 'Reading productivity';\
+  if (/\\b(book|read|fiction|novel|author|bestsell|epistolar|crime fiction|villains|characters|bookish)\\b/.test(t) && !/writing/.test(t)) return 'Books & reading';\
+  if (/\\b(gratitude|grateful|thankful|blessing|optimism|positiv|mindset|spiritual|lens of grat|abc of grat|gift of grat)\\b/.test(t)) return 'Gratitude & mindset';\
+  if (/\\b(write|writing|writer|blog|post|content|story|stories|storytell|publish|article|nanowrimo|wri?mo|shortform|30 day.*writ|writ.*30 day|prolific)\\b/.test(t)) return 'Writing craft';\
+  if (/\\b(career|job|work|workforce|leadership|leader|team|promot|success|professional|negotiat|salary|wharton|business strateg|smart creative|moms? re.enter|side hustle)\\b/.test(t)) return 'Career & leadership';\
+  if (/\\b(money|financ|wealth|earn|invest|saving|budget|rich|richest man|babylon|parenting.*financ|financ.*parent)\\b/.test(t)) return 'Finance & money';\
+  if (/\\b(mom|mother|parent|kid|child|family|lego|toddler|son|daughter|babysi)\\b/.test(t)) return 'Parenting & family';\
+  if (/\\b(ai|artificial intel|machine learn|data scien|github|canva|tech|analytics|gen ai|algorithm|tool|app|software)\\b/.test(t)) return 'Tech & AI';\
+  if (/\\b(how.to|lesson|tip|way|guide|step|mistake|secret|formula|hack|method)\\b/.test(t)) return 'How-to & listicles';\
+  if (/\\b(stats|milestone|anniversary|500|400|300|year.*retro|retro.*year|2022|2023|2024|goals and tally|writing plan|challenge.*result|result.*challenge)\\b/.test(t)) return 'Personal milestones';\
+  if (/\\b(sunday|snapshot|weekly|monthly|roundup|update|wrap.?up|week of|week #)\\b/.test(t)) return 'Snapshots & updates';\
+  return 'Other';\
+\}\
+\
+function titleStructure(title) \{\
+  const t = title.toLowerCase();\
+  if (/^\\d|^[0-9]+ (way|reason|lesson|tip|step|thing|book|fact|idea|hack|inspir)/i.test(title) ||\
+      / \\d+ (way|reason|lesson|tip|step|thing|book|fact|idea|hack|inspir)/i.test(title)) return 'Numbered list';\
+  if (/^(how|why|what|when|where|which)\\b/i.test(title)) return 'How/Why/What';\
+  if (/^(the |a |an )/i.test(title)) return 'Article opener';\
+  return 'Other';\
+\}\
+\
+// \uc0\u9472 \u9472 \u9472  DEAD SERIES DETECTION \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \
+function detectSeries(posts) \{\
+  const patterns = [\
+    \{ name: 'Minute Mentoring', re: /minute mentor/i \},\
+    \{ name: 'Sunday Snapshot', re: /sunday snapshot/i \},\
+    \{ name: 'Gratitude posts', re: /(gratitude|grateful|thankful|blessing).*post|weekly.*grat|grat.*week/i \},\
+    \{ name: 'N Reasons to Read [book]', re: /\\d+ reasons? to read/i \},\
+    \{ name: 'Monday Motivation', re: /monday motiv/i \},\
+    \{ name: 'Reading Challenge updates', re: /reading challenge/i \},\
+    \{ name: 'Weekly Snapshot', re: /weekly snapshot/i \},\
+  ];\
+  return patterns.map(p => \{\
+    const matched = posts.filter(x => p.re.test(x.title));\
+    const earned = matched.reduce((s,x) => s + x.earnings, 0);\
+    return \{ name: p.name, count: matched.length, earned \};\
+  \}).filter(s => s.count >= 3);\
+\}\
+\
+// \uc0\u9472 \u9472 \u9472  RECOMMENDATIONS ENGINE \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \
+function generateRecs(catStats, earners, allPosts) \{\
+  const sorted = Object.entries(catStats)\
+    .filter(([c]) => c !== '__MEDIUM__')\
+    .sort((a, b) => b[1].total - a[1].total);\
+\
+  const topCat = sorted[0];\
+  const topCatName = topCat ? topCat[0] : '';\
+  const avgEarnings = earners.length ? (earners.reduce((s,p)=>s+p.earnings,0)/earners.length).toFixed(2) : '1.00';\
+\
+  // Find best-performing structural elements among earners\
+  const numbered = earners.filter(p => titleStructure(p.title) === 'Numbered list');\
+  const numberedTotal = numbered.reduce((s,p)=>s+p.earnings,0);\
+  const hasLessonsPattern = earners.filter(p => /lesson|powerful|taught|learn/i.test(p.title));\
+\
+  const recs = [\
+    \{\
+      num: '1',\
+      priority: 'high',\
+      priorityLabel: 'Highest impact',\
+      title: `Lead with personal lessons from famous books \'97 not book reviews`,\
+      body: `Your "N Reasons to Read [book]" series earns almost nothing because it reads as a recommendation. Your earning book posts all extract personal lessons. Readers don't want a review \'97 they want what you took away and applied to real life. Lead with your story, hang the book off it.`,\
+      examples: [\
+        `"3 Things Atomic Habits changed in my morning routine"`,\
+        `"What I told my daughter after reading Lean In"`,\
+        `"5 lessons I still use from The Richest Man in Babylon"`,\
+      ]\
+    \},\
+    \{\
+      num: '2',\
+      priority: 'high',\
+      priorityLabel: 'Highest impact',\
+      title: `Mine your career story \'97 professional women in tech is an underleveraged niche`,\
+      body: `You have 5+ years of real credentials: career hikes, leading a 1500-person meetup, 3 published books, a Women's group at work. Almost none of it is on the page. Posts about career, re-entering work, and professional strategies earn at $1.25 avg \'97 and this audience reads deeply and pays attention.`,\
+      examples: [\
+        `"How I negotiated a raise while managing a toddler and a side hustle"`,\
+        `"3 career moves that actually worked as a South Asian woman in tech"`,\
+        `"What leading a 1500-person community taught me about workplace leadership"`,\
+      ]\
+    \},\
+    \{\
+      num: '3',\
+      priority: 'med',\
+      priorityLabel: 'Strong signal',\
+      title: `Teach reading productivity \'97 not what to read, but how to read better`,\
+      body: `"Summary Magic \'97 Improve Reading Retention" and "Reading Ruler \'97 Are You Using This Kindle Feature?" both earned. Your audience wants to read MORE and retain better, not just be told what to read. Teach the system. You've read 83+ books since 2020 \'97 that system is content gold.`,\
+      examples: [\
+        `"How I retain 80% of what I read (the system I built in 2023)"`,\
+        `"3 Kindle features most readers ignore"`,\
+        `"The 15-minute habit that got me to 83 books since 2020"`,\
+      ]\
+    \},\
+    \{\
+      num: '4',\
+      priority: 'med',\
+      priorityLabel: 'Strong signal',\
+      title: `Use numbered lists \'97 they've earned $\{numberedTotal > 0 ? '$'+numberedTotal : 'consistently more'\} vs other formats`,\
+      body: `Numbered list titles drive the majority of your non-$0 earnings. The number sets a clear expectation and improves click-through. Compare "Sunday Snapshot" ($0 most of the time) vs "3 Data Science Blog Post Ideas" ($2). Same effort to write \'97 completely different reader response.`,\
+      examples: [\
+        `"5 ways I finally built a consistent writing habit"`,\
+        `"3 lessons from running a Women's group at work"`,\
+        `"7 books that changed how I think about money"`,\
+      ]\
+    \},\
+    \{\
+      num: '5',\
+      priority: 'opp',\
+      priorityLabel: 'Untapped',\
+      title: `Publish honest retros with real numbers \'97 your data is rare and valuable`,\
+      body: `"Year of Books 2023 Retro," "30 Articles in 31 Days," and "5 Lessons from Visualizing Audience Growth" all earn because real behind-the-scenes data is scarce. You have years of writing stats, reading stats, and earnings data. Vulnerability + specificity + numbers = posts people finish reading.`,\
+      examples: [\
+        `"I published 400 posts. Here's what I'd cut if I started over."`,\
+        `"5 years of writing data: what the numbers actually say"`,\
+        `"How I read 83 books in 4 years around a full-time job and a toddler"`,\
+      ]\
+    \}\
+  ];\
+  return recs;\
+\}\
+\
+// \uc0\u9472 \u9472 \u9472  CHART INSTANCES \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \
+let chartInstances = \{\};\
+function destroyCharts() \{\
+  Object.values(chartInstances).forEach(c => \{ try \{ c.destroy(); \} catch(e)\{\} \});\
+  chartInstances = \{\};\
+\}\
+\
+// \uc0\u9472 \u9472 \u9472  MAIN ANALYSIS \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \
+async function runAnalysis() \{\
+  document.getElementById('loading').style.display = 'flex';\
+\
+  await new Promise(r => setTimeout(r, 50));\
+\
+  const parser = new DOMParser();\
+  const allPosts = [];\
+\
+  for (const file of loadedFiles) \{\
+    const text = await file.text();\
+    const doc = parser.parseFromString(text, 'text/html');\
+    const items = doc.querySelectorAll('li.h-entry');\
+    items.forEach(li => \{\
+      const a = li.querySelector('a');\
+      if (!a) return;\
+      const title = a.textContent.trim();\
+      const raw = li.textContent;\
+      const m = raw.match(/\\$([0-9,.]+)/);\
+      const earnings = m ? parseFloat(m[1].replace(/,/g,'')) : 0;\
+      allPosts.push(\{ title, earnings, url: a.href \});\
+    \});\
+  \}\
+\
+  // Deduplicate by title\
+  const seen = new Set();\
+  const posts = allPosts.filter(p => \{ if (seen.has(p.title)) return false; seen.add(p.title); return true; \});\
+\
+  // Categorize (exclude Medium meta from earning analysis)\
+  const earners = posts.filter(p => p.earnings > 0 && categorize(p.title) !== '__MEDIUM__');\
+  const allEarners = posts.filter(p => p.earnings > 0);\
+  const totalEarned = posts.reduce((s,p) => s+p.earnings, 0);\
+  const mediumEarned = posts.filter(p => p.earnings > 0 && categorize(p.title) === '__MEDIUM__').reduce((s,p)=>s+p.earnings,0);\
+  const nonMediumEarned = totalEarned - mediumEarned;\
+\
+  // Category stats\
+  const catStats = \{\};\
+  earners.forEach(p => \{\
+    const cat = categorize(p.title);\
+    if (!catStats[cat]) catStats[cat] = \{ total: 0, count: 0, posts: [] \};\
+    catStats[cat].total += p.earnings;\
+    catStats[cat].count += 1;\
+    catStats[cat].posts.push(p);\
+  \});\
+\
+  // Structure stats\
+  const structStats = \{\};\
+  earners.forEach(p => \{\
+    const s = titleStructure(p.title);\
+    if (!structStats[s]) structStats[s] = \{ total: 0, count: 0 \};\
+    structStats[s].total += p.earnings;\
+    structStats[s].count += 1;\
+  \});\
+\
+  // Dead series\
+  const deadSeries = detectSeries(posts);\
+\
+  renderResults(\{ posts, earners, allEarners, catStats, structStats, deadSeries, totalEarned, nonMediumEarned \});\
+\}\
+\
+function renderResults(\{ posts, earners, allEarners, catStats, structStats, deadSeries, totalEarned, nonMediumEarned \}) \{\
+  destroyCharts();\
+\
+  // KPIs\
+  const convRate = posts.length ? Math.round((allEarners.length / posts.length) * 100) : 0;\
+  const topPost = [...earners].sort((a,b) => b.earnings - a.earnings)[0];\
+  document.getElementById('kpiRow').innerHTML = `\
+    <div class="kpi"><div class="kpi-label">Total posts</div><div class="kpi-val">$\{posts.length\}</div></div>\
+    <div class="kpi"><div class="kpi-label">Earning posts (non-Medium)</div><div class="kpi-val">$\{earners.length\}</div><div class="kpi-sub">$\{convRate\}% conversion rate</div></div>\
+    <div class="kpi"><div class="kpi-label">Non-Medium earnings</div><div class="kpi-val">$$\{nonMediumEarned.toFixed(0)\}</div><div class="kpi-sub">of $$\{totalEarned.toFixed(0)\} total</div></div>\
+    <div class="kpi"><div class="kpi-label">Top single post</div><div class="kpi-val">$\{topPost ? '$'+topPost.earnings : '-'\}</div><div class="kpi-sub">$\{topPost ? topPost.title.slice(0,28)+'\'85' : ''\}</div></div>\
+  `;\
+\
+  // Sort cats\
+  const sortedCats = Object.entries(catStats).sort((a,b) => b[1].total - a[1].total);\
+  const catLabels = sortedCats.map(([c]) => c);\
+  const catTotals = sortedCats.map(([,s]) => s.total);\
+  const catColors = sortedCats.map(([c]) => CAT_COLORS[c]?.bar || '#B4B2A9');\
+\
+  // Category chart\
+  const catCtx = document.getElementById('catChart').getContext('2d');\
+  chartInstances.cat = new Chart(catCtx, \{\
+    type: 'bar',\
+    data: \{\
+      labels: catLabels,\
+      datasets: [\{\
+        data: catTotals,\
+        backgroundColor: catColors,\
+        borderRadius: 5,\
+        borderSkipped: false,\
+      \}]\
+    \},\
+    options: \{\
+      responsive: true,\
+      maintainAspectRatio: false,\
+      plugins: \{ legend: \{ display: false \}, tooltip: \{ callbacks: \{ label: ctx => ` $$\{ctx.raw\}` \} \} \},\
+      scales: \{\
+        x: \{ ticks: \{ font: \{ size: 10, family: 'DM Sans' \}, color: '#8a8784', maxRotation: 35 \}, grid: \{ display: false \}, border: \{ display: false \} \},\
+        y: \{ ticks: \{ font: \{ size: 10, family: 'DM Sans' \}, color: '#8a8784', callback: v => '$'+v \}, grid: \{ color: '#e8e5de' \}, border: \{ display: false \} \}\
+      \}\
+    \}\
+  \});\
+\
+  // Structure chart\
+  const sLabels = Object.keys(structStats);\
+  const sTotals = sLabels.map(l => structStats[l].total);\
+  const sCounts = sLabels.map(l => structStats[l].count);\
+  const sColors = ['#CECBF6','#9FE1CB','#FAC775','#B4B2A9'];\
+  const structCtx = document.getElementById('structChart').getContext('2d');\
+  chartInstances.struct = new Chart(structCtx, \{\
+    type: 'doughnut',\
+    data: \{\
+      labels: sLabels.map((l,i) => `$\{l\} ($\{sCounts[i]\} posts)`),\
+      datasets: [\{ data: sTotals, backgroundColor: sColors, borderWidth: 0, hoverOffset: 6 \}]\
+    \},\
+    options: \{\
+      responsive: true,\
+      maintainAspectRatio: false,\
+      plugins: \{\
+        legend: \{ position: 'bottom', labels: \{ font: \{ size: 10, family: 'DM Sans' \}, color: '#8a8784', padding: 10, boxWidth: 10, boxHeight: 10 \} \},\
+        tooltip: \{ callbacks: \{ label: ctx => ` $$\{ctx.raw\} earned` \} \}\
+      \},\
+      cutout: '60%'\
+    \}\
+  \});\
+\
+  // Avg bars\
+  const maxAvg = Math.max(...sortedCats.map(([,s]) => s.total/s.count));\
+  document.getElementById('avgBars').innerHTML = sortedCats.map(([cat, s]) => \{\
+    const avg = (s.total / s.count).toFixed(2);\
+    const pct = Math.round((avg / maxAvg) * 100);\
+    const color = CAT_COLORS[cat]?.bar || '#B4B2A9';\
+    return `<div class="bar-row">\
+      <div class="bar-label">$\{cat\}</div>\
+      <div class="bar-track"><div class="bar-fill" style="width:$\{pct\}%;background:$\{color\}"></div></div>\
+      <div class="bar-val">$$\{avg\} avg \'b7 $\{s.count\} posts</div>\
+    </div>`;\
+  \}).join('');\
+\
+  // Top earners table\
+  const topEarners = [...earners].sort((a,b) => b.earnings - a.earnings).slice(0, 15);\
+  document.getElementById('earnerRows').innerHTML = topEarners.map(p => \{\
+    const cat = categorize(p.title);\
+    const style = CAT_COLORS[cat]?.badge || 'background:#edece6;color:#4a4845';\
+    return `<tr>\
+      <td>$\{p.title\}</td>\
+      <td><span class="cat-badge" style="$\{style\}">$\{cat\}</span></td>\
+      <td>$$\{p.earnings.toFixed(0)\}</td>\
+    </tr>`;\
+  \}).join('');\
+\
+  // Dead series\
+  const deadSorted = deadSeries.filter(s => s.count >= 3).sort((a,b) => b.count - a.count);\
+  document.getElementById('deadGrid').innerHTML = deadSorted.map(s =>\
+    `<div class="dead-card"><div class="dead-name">$\{s.name\}</div><div class="dead-stat">$\{s.count\} posts \'b7 $$\{s.earned.toFixed(0)\} earned total</div></div>`\
+  ).join('');\
+  const totalDeadPosts = deadSorted.reduce((s,d) => s+d.count, 0);\
+  document.getElementById('deadNote').textContent = totalDeadPosts > 0\
+    ? `$\{totalDeadPosts\} posts across these series represent significant time investment with minimal return.`\
+    : '';\
+\
+  // Recommendations\
+  const recs = generateRecs(catStats, earners, posts);\
+  document.getElementById('recsContainer').innerHTML = recs.map(r => \{\
+    const ptClass = r.priority === 'high' ? 'pt-high' : r.priority === 'med' ? 'pt-med' : 'pt-opp';\
+    return `<div class="rec">\
+      <div class="rec-num">$\{r.num\}</div>\
+      <div>\
+        <div class="rec-title"><span class="priority-tag $\{ptClass\}">$\{r.priorityLabel\}</span>$\{r.title\}</div>\
+        <div class="rec-body">$\{r.body\}</div>\
+        <div class="rec-examples">$\{r.examples.map(e => `<span class="rec-ex">$\{e\}</span>`).join('')\}</div>\
+      </div>\
+    </div>`;\
+  \}).join('');\
+\
+  document.getElementById('loading').style.display = 'none';\
+  document.getElementById('upload-view').style.display = 'none';\
+  document.getElementById('results-view').style.display = 'block';\
+  window.scrollTo(0,0);\
+\}\
+\
+function resetTool() \{\
+  loadedFiles = [];\
+  document.getElementById('filePills').innerHTML = '';\
+  document.getElementById('analyzeBtn').style.display = 'none';\
+  document.getElementById('fileInput').value = '';\
+  document.getElementById('results-view').style.display = 'none';\
+  document.getElementById('upload-view').style.display = 'flex';\
+  destroyCharts();\
+\}\
+</script>\
+</body>\
+</html>}
