@@ -1,0 +1,124 @@
+---
+name: medium-title-generator
+description: >
+  Generates 10 scroll-stopping Medium title + subtitle combinations from a blog post, raw text, or idea outline.
+  Use this skill whenever the user wants to brainstorm, generate, or improve Medium article titles and subtitles —
+  including when they share a draft, a topic idea, a bullet-point outline, or an existing article they want to repurpose.
+  Also trigger when the user says anything like "title ideas", "headline options", "Medium titles", "help me name my article",
+  or pastes content and asks "what should I call this?"
+  Applies Niru's (nirupamaprv / patterntopath) specific voice, Medium platform conventions, and scroll-stop principles.
+---
+
+# Medium Title Generator
+
+Generates 10 scroll-stopping title + subtitle combinations for Medium articles published in **Niru's Notes** (account: nirupamaprv).
+
+## Critical: Ask-First Workflow
+
+**If the user says "title ideas" (or any trigger phrase) WITHOUT providing content or an outline, always ask for the topic outline FIRST before generating anything.**
+
+Use this exact prompt:
+> "What's the article about? Share a quick outline, a few bullet points, or even just the core idea — I'll use that to generate 10 title options for Niru's Notes."
+
+Only proceed to generate titles once the user has provided their outline or topic.
+
+## When to use this skill
+
+- User says "title ideas" with or without accompanying content
+- User shares a blog post draft, outline, idea, or raw notes and wants title options
+- User explicitly asks for "Medium titles," "headline ideas," or similar
+- User pastes content and says "what should I call this?"
+- User wants to repurpose an existing article with a fresh title
+
+---
+
+## Voice Profiles
+
+There are two voice contexts. Detect from user's request, or ask if ambiguous.
+
+### `nirupamaprv` (Medium + Instagram @nirupamaprv)
+Audience: data professionals, analytics leaders, people navigating career transitions into AI/tech.  
+Tone: reflective practitioner — someone who has done the work and is sharing what she learned. Warm, grounded, direct. Mixes data fluency with human storytelling. Avoids jargon for jargon's sake. Optimistic but honest about friction.  
+Voice markers: "I built X and here's what happened", "what 12 years in data taught me", "the thing nobody tells you about Y", "here's the pattern I keep seeing"
+
+### `patterntopath` (Instagram @patterntopath)
+Audience: women navigating career pivots, sabbaticals, re-entry, personal reinvention. Adjacent to reading, habits, self-development.  
+Tone: warmer, more personal and introspective. Still data-informed but leaning into lived experience. Hopeful, honest about the messy middle.  
+Voice markers: "what I wish I'd known", "the quiet shift that changed everything", "building a new kind of career", "for anyone who feels behind"
+
+---
+
+## Title Rules
+
+1. **Use numbers aggressively** — push to include a number in every title where it's plausible. Timeframes ("after 5 years"), counts ("7 patterns"), quantities ("1 skill"), rankings ("the #1 mistake") all count. Aim for numbers in at least 7 of the 10 titles.
+2. **Lead with action verbs when not using a number** — "Stop Optimizing for Followers," "Track What Actually Earns," "Quit Treating Every Post the Same." The verb should be the first word or close to it.
+3. **Under 20 words** (title only)
+4. **Clickworthy, not sensational** — no fake urgency, no "you won't believe," no ALL CAPS shock bait
+5. **Specific over generic** — "after 90 days of AI tool-building" beats "how AI changed my career"
+6. **Subtitle expands, not repeats** — add new information (audience, stakes, scope, twist), never echo the title
+7. **Never open with "I"** — start with a number, action verb, timeframe, or "Why / How / What"
+8. **No pairs of 3 phrases** — avoid triple-clause constructions like "X, Y, and Z" or "do this, not that, and also this." They read as AI-generated filler. One clean idea per title.
+9. **Preferred structure:** concrete subject → result or shift
+   - ✅ *6 Months of Building AI Tools Instead of Job Searching — Results and Mindset Shifts*
+   - ✅ *Stop Treating Every Post the Same — Here's What My Earnings Data Actually Shows*
+   - ❌ *I Took a Sabbatical. I Did Not Rest. I Built.* (parallel fragments, AI-sounding)
+   - ❌ *I Designed My Own Sabbatical Curriculum. Here's the Syllabus.* (clever pivot, artificial)
+   - ❌ *Read More, Write Better, and Earn Consistently* (triple phrase, generic)
+
+---
+
+## Output Format
+
+Always return exactly 10 combinations, numbered 1–10.
+
+For each:
+```
+**[NUMBER]. [TITLE]**
+*[Subtitle that expands and adds new info]*
+```
+
+After the 10 options, add a short note (2–3 sentences max) explaining the range — e.g., which lean more personal vs. analytical, which use numbers, which might suit a specific platform best.
+
+---
+
+## Process
+
+1. **Read the input** (draft, outline, notes, topic idea) and extract:
+   - Core argument or insight
+   - Specific data points, timeframes, or numbers present
+   - Emotional arc (struggle → discovery? before/after? myth-busting?)
+   - Target reader (data professional? career pivoter? general?)
+
+2. **Apply voice profile** based on context (ask if unclear)
+
+3. **Generate 10 titles** with variety across:
+   - Structural forms: list, confession, how-to, question, before/after, personal story lede
+   - Tone range: practical/tactical → reflective/personal (spread across the 10)
+   - Number usage: aim for numbers in at least 5–6 of the 10
+
+4. **Write each subtitle** to stand alone — a reader should be able to understand the article's value from subtitle alone
+
+---
+
+## Examples of strong titles in this voice
+
+- *6 Months of Building AI Tools Instead of Job Searching — Results and Mindset Shifts*
+- *3 Things My Sabbatical Taught Me That 12 Years in Data Never Did*
+- *Why Most Analytics Leaders Are Underprepared for the AI Shift — and What to Do About It*
+- *7 Patterns From 50 Analytics Job Descriptions — and What They Tell Us About the Skills Gap*
+- *After 12 Years in Data, Here's the 1 Skill I Wish I'd Built Sooner*
+- *Why Slowing Down Was the Fastest Career Move I Made*
+
+---
+
+## Anti-patterns to avoid
+
+- **Opening with "I"** — always lead with a number, action verb, or timeframe
+- **Pairs of 3 phrases** — *"Read more, write better, earn consistently"* or *"I rested. I built. I shipped."* — triple constructions feel AI-generated. One idea per title.
+- **Parallel fragment pairs** — *"I Did Not Rest. I Built."* — reads as crafted, not written
+- **"Here's the X" endings** — *"Here's the Syllabus," "Here's What I Found"* — overused, lazy pivot
+- **Vague superlatives** — "The Ultimate Guide," "Everything You Need to Know"
+- **Manufactured urgency** — "Before it's too late," "You NEED to read this"
+- **Passive or flat openings** — "A Look at...", "Some Thoughts on..."
+- **Title + subtitle that repeat the same idea** in different words
+- **Skipping numbers** — if a number can plausibly fit, use it. Don't settle for abstract when specific is available.
