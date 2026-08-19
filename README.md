@@ -1,2 +1,2 @@
-# AI or LLM or Vibe Coded Projects
-Repo to store no code projects and experimentation
+# Gen AI Assisted Projects
+Repo to store no code projects, AI assisted built apps and experimentation
